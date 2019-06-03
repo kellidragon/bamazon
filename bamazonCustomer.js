@@ -125,54 +125,8 @@ function placeOrder() {
 //TODO: UPDATE DATABASE WITH QUANTITY INFO
 //SHOW TOTAL PRICE OF ITEMS
 
-                    // if (chosenItem.highest_bid < parseInt(answer.bid)) {
-                    //     // bid was high enough, so update db, let the user know, and start over
-                    //     connection.query(
-                    //       "UPDATE auctions SET ? WHERE ?",
-                    //       [
-                    //         {
-                    //           highest_bid: answer.bid
-                    //         },
-                    //         {
-                    //           id: chosenItem.id
-                    //         }
-                    //       ],
-
-                    // .then(function (inquirerResponse) {
-                // if (inquirerResponse.confirm) {
-                //     connection.query("SELECT * from products where ?"
-                //     [
-                //         {
-                //             item_id: "selectedProducts"
-                //         }
-                //     ],
-                //         function (err, res) {
-                //             // if (err) throw err;
-                //             console.log("\n\n YOU HAVE SELECTED THE FOLLOWING ITEM(S): \n" + res);
-                //             // addQuantity();
-                //         });
-                // } else {
-                //     console.log("\nThat's okay, maybe next time.\n");
-                // }
+            
 
 
 
-// function addQuantity() {
 
-//     inquirer
-//         .prompt([
-//             {
-//                 type: "input",
-//                 message: "How many units would you like?",
-//                 name: "quantity"
-//             },
-//         ]).then(function (inquirerResponse) {
-//             if (inquirerResponse.confirm) {
-//                 console.log("You've selected \n");
-//                 console.log("ID#   ||   Name   ||    Price \n");
-//                 connection.query("SELECT item_id, product_name, price FROM products", function (err, res) {
-//                     if (err) throw err;
-//                     console.log(res);
-//                     connection.end();
-//                 });
-//             
