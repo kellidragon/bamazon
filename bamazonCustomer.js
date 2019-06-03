@@ -73,24 +73,24 @@ function placeOrder() {
                         return choiceArray;
                     }
                 },
-                {
-                    name: "quantity",
-                    type: "input",
-                    message: "How many units would you like?",
+                // {
+                //     name: "quantity",
+                //     type: "input",
+                //     message: "How many units would you like?",
                     // validate: function (value) {
-                    //     connection.query("SELECT stock_quantity FROM products", function (err, res) {
-                    //         if (err) throw err;
-                    //         console.log(res)
-                    //         // if (parseInt(value) > res) {
-                            //     console.log("Sorry, insufficient quantity, check back later.")
-                            // }
-                            // } else {
+                    //     // connection.query("SELECT stock_quantity FROM products", function (err, res) {
+                    //         // if (err) throw err;
+                    //         // console.log(res)
+                    //         if (value > stock_quantity) {
+                    //             console.log("Sorry, insufficient qua÷ntity, check back later.")
+                    //         }
+                            //  else {
                             //     console.log(res);
                             //     // connection.end();
                             // }
                         // })
                     // }
-                }
+                // }
 
 
             ]).then(function (answer) {
@@ -101,13 +101,27 @@ function placeOrder() {
                         chosenItem = results[i];
                         console.log("\n\n YOU HAVE SELECTED THE FOLLOWING: \n")
                         console.log("--------------------------------")
-                        console.log(answer.quantity + chosenItem);
-                        console.log("YOUR TOTAL IS: ")
+                        console.log(chosenItem);
+                        // console.log("YOUR TOTAL IS: ")
                     }
+                    
 
                 }
                 inquirer
                     .prompt([
+                        {
+                            name: "quantity",
+                            type: "input",
+                            message: "How many units would you like?",
+                            validate: function(value) {
+                                if(value > chosenItem.stock_quantity){
+                                console.log("Sorry, insufficient quantity, check back later.")
+                            }else{
+                                console.log("\n\n YOU HAVE SELECTED: " + value + " unit(s)")
+                                console.log("--------------------------------")
+                            }
+                        }
+                        },
                         {
                             type: "confirm",
                             message: "PLACE ORDER?",
