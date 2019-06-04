@@ -72,25 +72,8 @@ function placeOrder() {
                         }
                         return choiceArray;
                     }
-                },
-                // {
-                //     name: "quantity",
-                //     type: "input",
-                //     message: "How many units would you like?",
-                    // validate: function (value) {
-                    //     // connection.query("SELECT stock_quantity FROM products", function (err, res) {
-                    //         // if (err) throw err;
-                    //         // console.log(res)
-                    //         if (value > stock_quantity) {
-                    //             console.log("Sorry, insufficient qua÷ntity, check back later.")
-                    //         }
-                            //  else {
-                            //     console.log(res);
-                            //     // connection.end();
-                            // }
-                        // })
-                    // }
-                // }
+                }
+
 
 
             ]).then(function (answer) {
@@ -104,8 +87,6 @@ function placeOrder() {
                         console.log(chosenItem);
                         // console.log("YOUR TOTAL IS: ")
                     }
-                    
-
                 }
                 inquirer
                     .prompt([
@@ -113,34 +94,45 @@ function placeOrder() {
                             name: "quantity",
                             type: "input",
                             message: "How many units would you like?",
-                            validate: function(value) {
-                                if(value > chosenItem.stock_quantity){
-                                console.log("Sorry, insufficient quantity, check back later.")
-                            }else{
-                                console.log("\n\n YOU HAVE SELECTED: " + value + " unit(s)")
-                                console.log("--------------------------------")
+                            validate: function (value) {
+                                if (value > chosenItem.stock_quantity) {
+                                    console.log("Sorry, insufficient quantity, check back later.")
+                                } else {
+                                    console.log("\n \n-------------------------------", "\n YOUR ORDER SUMMARY: "
+                                        + value + " " + chosenItem.product_name + "\n",
+                                        "--------------------------------")
+                                    connection.query("UPDATE products SET stock_quantity where ?",
+                                        [
+                                            {
+                                                stock_quantity: chosenItem.stock_quantity - value
+                                            }
+                                        ],
+                                        function (error) {
+                                            if (error) throw err;
+                                        }
+                                    )
+                                }
                             }
-                        }
                         },
-                        {
-                            type: "confirm",
-                            message: "PLACE ORDER?",
-                            name: "confirm",
-                            default: true
+                            {
+                                type: "confirm",
+                                message: "\n \n PLACE THIS ORDER?\n \n",
+                                name: "confirm",
+                                default: true
+                            },
+                    ]).then(function(inquirerResponse){
+                        if(inquirerResponse.confirm){
+                            console.log("CONGRATS! YOUR ORDER HAS BEEN PLACED SUCCESSFULLY!");
+                            console.log("YOUR TOTAL IS: " + inquirerResponse.price);
                         }
-                    ])
+                    })
             }
-            )
-    }
-    )
-}
-//CHECK THE QUANITITY IS AVAIL (fix validate section)
-//TODO: PRETTY UP INVENTORY LIST
+            )}
+            )}
+
+
+//TODO: PRETTY UP INVENTORY LIST + Product selected list
 //TODO: UPDATE DATABASE WITH QUANTITY INFO
 //SHOW TOTAL PRICE OF ITEMS
 
-            
-
-
-
-
+           
