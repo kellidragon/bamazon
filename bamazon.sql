@@ -14,7 +14,7 @@ CREATE TABLE products (
 );
 
 INSERT INTO products (product_name, department_name, price, stock_quantity)
-VALUES ("soccer ball", "sports", 8.50, 100);
+VALUES ("soccer ball(s)", "sports", 8.50, 100);
 
 INSERT INTO products (product_name, department_name, price, stock_quantity)
 VALUES ("cleats", "sports", 39.99, 40);
@@ -32,13 +32,13 @@ INSERT INTO products (product_name, department_name, price, stock_quantity)
 VALUES ("headphones", "electronics", 49.99, 200);
 
 INSERT INTO products (product_name, department_name, price, stock_quantity)
-VALUES ("collar", "pets", 5.29, 2999);
+VALUES ("collar(s)", "pets", 5.29, 2999);
 
 INSERT INTO products (product_name, department_name, price, stock_quantity)
 VALUES ("kibble", "pets", 24.99, 4);
 
 INSERT INTO products (product_name, department_name, price, stock_quantity)
-VALUES ("pants", "clothing", 59.99, 100);
+VALUES ("pants(s))", "clothing", 59.99, 100);
 
 INSERT INTO products (product_name, department_name, price, stock_quantity)
-VALUES ("jacket", "clothing", 79.99, 35);
+VALUES ("jacket(s)", "clothing", 79.99, 35);

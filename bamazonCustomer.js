@@ -1,5 +1,6 @@
 var mysql = require("mysql");
 var inquirer = require("inquirer");
+var Table = require("cli-table");
 
 //connect to the database
 var connection = mysql.createConnection({
@@ -12,7 +13,7 @@ var connection = mysql.createConnection({
 
 connection.connect(function (err) {
     if (err) throw err;
-    console.log("--------------------------------------------------------\n")
+    console.log("\n\n\n--------------------------------------------------------")
     console.log("\nWELCOME TO BAMAZON, THE WORLD'S LARGEST ONLINE STORE!\n")
     console.log("--------------------------------------------------------\n")
     showInventory();
@@ -25,22 +26,32 @@ function showInventory() {
         .prompt([
             {
                 type: "confirm",
-                message: "Would you like to see the inventory?",
+                message: "\nVIEW INVENTORY",
                 name: "confirm",
                 default: true
             }
         ])
         .then(function (inquirerResponse) {
             if (inquirerResponse.confirm) {
-                console.log("\n \n PRODUCTS LIST: ");
-                console.log("---------------------------\n")
-                console.log("ID#   ||   Name   ||    Price");
-                console.log("--------------------------------\n")
                 connection.query("SELECT item_id, product_name, price FROM products", function (err, res) {
                     if (err) throw err;
-                    console.log(res);
+
+                    console.log("\n \n PRODUCTS LIST: ");
+                    console.log("---------------------------\n")
+
+                    var table = new Table({
+                        head: ['ID#', 'PRODUCT', 'PRICE']
+                        , colWidths: [10, 30, 20]
+                    });
+                    for (var i = 0; i < res.length; i++) {
+                        table.push(
+                            [res[i].item_id, res[i].product_name,
+                            res[i].price]
+                        );
+
+                    }
                     placeOrder();
-                    connection.end();
+                    console.log(table.toString());
                 });
             }
             else {
@@ -53,6 +64,7 @@ function showInventory() {
 function placeOrder() {
     connection.query("SELECT * FROM products", function (err, results) {
         if (err) throw err;
+
         inquirer
             .prompt([
                 {
@@ -72,67 +84,67 @@ function placeOrder() {
                         }
                         return choiceArray;
                     }
-                }
+                },
+                {
+                    name: "quantity",
+                    type: "input",
+                    message: "\n \n HOW MANY UNITS WOULD YOU LIKE?",
+                    validate: function(value){
+                        if(isNaN(value)){
+                          return false;
+                        } else{
+                          return true;
+                        }
+                      }
 
-
-
+                } 
             ]).then(function (answer) {
-                // get the information of the chosen item
-                var chosenItem;
-                for (var i = 0; i < results.length; i++) {
-                    if (results[i].item_id === answer.choice) {
-                        chosenItem = results[i];
-                        console.log("\n\n YOU HAVE SELECTED THE FOLLOWING: \n")
-                        console.log("--------------------------------")
-                        console.log(chosenItem);
-                        // console.log("YOUR TOTAL IS: ")
-                    }
-                }
-                inquirer
-                    .prompt([
+
+                var chosenItem = (answer.choice) - 1;
+                var amount = parseInt(answer.quantity);
+                var total = parseFloat(((results[chosenItem].price) * amount).toFixed(2));
+                
+                // // get the information of the chosen item
+
+                if (results[chosenItem].stock_quantity >= parseInt(amount)) {
+                    console.log("-------------------------------------------------------------")
+                    console.log("Your total for " + amount + "-" + results[chosenItem].product_name + " is " + "$" + total.toFixed(2) )
+                    console.log("-------------------------------------------------------------")
+                //     //updates products quantity in mysql
+                    connection.query("UPDATE products SET ? WHERE ?", [
                         {
-                            name: "quantity",
-                            type: "input",
-                            message: "How many units would you like?",
-                            validate: function (value) {
-                                if (value > chosenItem.stock_quantity) {
-                                    console.log("Sorry, insufficient quantity, check back later.")
-                                } else {
-                                    console.log("\n \n-------------------------------", "\n YOUR ORDER SUMMARY: "
-                                        + value + " " + chosenItem.product_name + "\n",
-                                        "--------------------------------")
-                                    connection.query("UPDATE products SET stock_quantity where ?",
-                                        [
-                                            {
-                                                stock_quantity: chosenItem.stock_quantity - value
-                                            }
-                                        ],
-                                        function (error) {
-                                            if (error) throw err;
-                                        }
-                                    )
-                                }
-                            }
+                            stock_quantity: results[chosenItem].stock_quantity - amount
                         },
+                        {
+                            item_id: results[chosenItem].item_id
+                        }
+                    ], function (err, result) {
+                        inquirer
+                        .prompt([
                             {
                                 type: "confirm",
-                                message: "\n \n PLACE THIS ORDER?\n \n",
-                                name: "confirm",
+                                message: "\n \n CONFIRM ORDER?\n \n",
+                                name: "confirmOrder",
                                 default: true
-                            },
-                    ]).then(function(inquirerResponse){
-                        if(inquirerResponse.confirm){
-                            console.log("CONGRATS! YOUR ORDER HAS BEEN PLACED SUCCESSFULLY!");
-                            console.log("YOUR TOTAL IS: " + inquirerResponse.price);
-                        }
-                    })
-            }
+                            }
+                        ]).then(function(answer){
+                        if (err) throw err;
+                        console.log("\n\n---------------------------------------------------------------------------")
+                        console.log ("SUCCESS! YOUR ODER HAS BEEN PLACED! ORDER WILL SHIP IN 1-2 BUSINESS DAYS.")
+                        console.log("---------------------------------------------------------------------------")
+                        console.log("\n\n-----------------------------------------")
+                        console.log ("           KEEP SHOPPING?")
+                        console.log("-----------------------------------------")
+                        showInventory();
+                       }
             )}
-            )}
+        ) 
+        } else {
+            console.log("Sorry, there's not enough in stock!")
+            console.log ("KEEP SHOPPING?")
+            showInventory();
+        }
+        })
 
-
-//TODO: PRETTY UP INVENTORY LIST + Product selected list
-//TODO: UPDATE DATABASE WITH QUANTITY INFO
-//SHOW TOTAL PRICE OF ITEMS
-
-           
+    })
+}
